@@ -1,0 +1,16 @@
+{
+  "module-code": "bmad-dl-lifecycle",
+  "capabilities": [
+    {
+      "name": "detailed-design",
+      "menu-code": "DLD",
+      "description": "Produces granular task breakdown from architecture.",
+      "supports-headless": true,
+      "phase-name": "3-design",
+      "after": ["bmad-dl-architecture"],
+      "before": ["bmad-dl-implementation"],
+      "is-required": true,
+      "output-location": "{output_folder}"
+    }
+  ]
+}

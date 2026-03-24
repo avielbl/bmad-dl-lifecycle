@@ -1,0 +1,16 @@
+{
+  "module-code": "bmad-dl-lifecycle",
+  "capabilities": [
+    {
+      "name": "architecture",
+      "menu-code": "DLA",
+      "description": "Produces system architecture document from approved PRD.",
+      "supports-headless": true,
+      "phase-name": "2-architecture",
+      "after": ["bmad-dl-initiation"],
+      "before": ["bmad-dl-detailed-design"],
+      "is-required": true,
+      "output-location": "{output_folder}"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "module-code": "bmad-dl-lifecycle",
+  "capabilities": [
+    {
+      "name": "revision",
+      "menu-code": "DLR",
+      "description": "Produces revision plan and updated docs from analysis.",
+      "supports-headless": true,
+      "phase-name": "6-revision",
+      "after": ["bmad-dl-analysis"],
+      "before": ["bmad-dl-implementation"],
+      "output-location": "{output_folder}"
+    }
+  ]
+}

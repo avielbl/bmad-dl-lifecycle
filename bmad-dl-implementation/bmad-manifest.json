@@ -1,0 +1,16 @@
+{
+  "module-code": "bmad-dl-lifecycle",
+  "capabilities": [
+    {
+      "name": "implementation",
+      "menu-code": "DLM",
+      "description": "Executes a task and appends to integration log.",
+      "supports-headless": true,
+      "phase-name": "4-implementation",
+      "after": ["bmad-dl-detailed-design"],
+      "before": ["bmad-dl-analysis"],
+      "is-required": true,
+      "output-location": "{output_folder}"
+    }
+  ]
+}

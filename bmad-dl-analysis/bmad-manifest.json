@@ -1,0 +1,16 @@
+{
+  "module-code": "bmad-dl-lifecycle",
+  "capabilities": [
+    {
+      "name": "analysis",
+      "menu-code": "DLN",
+      "description": "Produces experiment analysis report from training logs.",
+      "supports-headless": true,
+      "phase-name": "5-analysis",
+      "after": ["bmad-dl-implementation"],
+      "before": ["bmad-dl-revision"],
+      "is-required": true,
+      "output-location": "{output_folder}"
+    }
+  ]
+}
