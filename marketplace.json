@@ -1,0 +1,150 @@
+{
+  "module": {
+    "code": "bmad-dl-lifecycle",
+    "name": "bmad-dl-lifecycle",
+    "version": "1.2.0",
+    "description": "Agentic workflows for the Deep Learning development lifecycle."
+  },
+  "skills": [
+    {
+      "skill": "bmad-dl-initiation",
+      "name": "initiation",
+      "menu-code": "DLI",
+      "phase": "1-initiation",
+      "description": "Produces PRD for a new ML/DL project.",
+      "after": [],
+      "before": [
+        "bmad-dl-architecture"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-eda",
+      "name": "eda",
+      "menu-code": "DLE",
+      "phase": "2-eda",
+      "description": "Performs exploratory data analysis, establishes baselines, and produces an EDA report with domain expert interpretations to constrain architectural decisions.",
+      "after": [
+        "bmad-dl-initiation"
+      ],
+      "before": [
+        "bmad-dl-architecture"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-architecture",
+      "name": "architecture",
+      "menu-code": "DLA",
+      "phase": "3-architecture",
+      "description": "Produces system architecture grounded in EDA findings and Research Thesis.",
+      "after": [
+        "bmad-dl-eda"
+      ],
+      "before": [
+        "bmad-dl-detailed-design"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-detailed-design",
+      "name": "detailed-design",
+      "menu-code": "DLD",
+      "phase": "4-design",
+      "description": "Produces granular task breakdown from architecture and EDA constraints.",
+      "after": [
+        "bmad-dl-architecture"
+      ],
+      "before": [
+        "bmad-dl-techspec"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-techspec",
+      "name": "techspec",
+      "menu-code": "DLT",
+      "phase": "4.5-techspec",
+      "description": "Produces a pre-experiment contract with locked parameter search space, compute budget, and tiered success criteria before any training begins.",
+      "after": [
+        "bmad-dl-detailed-design"
+      ],
+      "before": [
+        "bmad-dl-implementation"
+      ],
+      "supports-headless": false,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-implementation",
+      "name": "implementation",
+      "menu-code": "DLM",
+      "phase": "5-implementation",
+      "description": "Executes a task and appends to integration log with mandatory failure documentation.",
+      "after": [
+        "bmad-dl-techspec"
+      ],
+      "before": [
+        "bmad-dl-analysis"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-analysis",
+      "name": "analysis",
+      "menu-code": "DLN",
+      "phase": "6-analysis",
+      "description": "Analyzes experiment results against Research Thesis hypothesis and PRD requirements.",
+      "after": [
+        "bmad-dl-implementation"
+      ],
+      "before": [
+        "bmad-dl-revision"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-revision",
+      "name": "revision",
+      "menu-code": "DLR",
+      "phase": "7-revision",
+      "description": "Updates Research Thesis with new hypothesis and produces revision plan from Domain Expert + Tech Lead.",
+      "after": [
+        "bmad-dl-analysis"
+      ],
+      "before": [
+        "bmad-dl-implementation"
+      ],
+      "supports-headless": true,
+      "is-required": false
+    },
+    {
+      "skill": "bmad-dl-advise",
+      "name": "advise",
+      "menu-code": "DLV",
+      "phase": "universal",
+      "description": "Searches past experiments, retrospectives, and TECHSPECs to surface validated parameters and failure warnings before starting new work. Run before any new experiment or EDA cycle.",
+      "after": [],
+      "before": [],
+      "supports-headless": true,
+      "is-required": false
+    },
+    {
+      "skill": "bmad-dl-retrospective",
+      "name": "retrospective",
+      "menu-code": "DLX",
+      "phase": "universal",
+      "description": "Captures session learnings as a structured knowledge document. Run at the end of any implementation or analysis session to preserve what worked, what failed, and exact parameters for future /bmad-dl-advise discovery.",
+      "after": [],
+      "before": [],
+      "supports-headless": false,
+      "is-required": false
+    }
+  ]
+}
