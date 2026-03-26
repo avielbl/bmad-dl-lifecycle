@@ -30,15 +30,39 @@ python3 scripts/get\_next\_task.py docs/design/03\_Detailed\_Design.md docs/impl
 
 \`\`\`
 
-2\. For \*\*TSK-001 (EDA)\*\*, run the EDA analyzer on the project data directory and attach the report:
+2\. For \*\*TSK-001 (EDA)\*\*, run the full EDA suite and attach reports:
 
 \`\`\`bash
 
+\# Structural EDA (class distributions, splits, data quality)
+
 python3 scripts/eda\_analyzer.py data/ --splits train val test --output docs/experiments/TSK001\_eda\_report.md
+
+\# Baseline classifier (establishes performance floor for REQ-PERF targets)
+
+python3 scripts/baseline\_classifier.py data/features.csv docs/prd/01\_PRD.md --label-col label
+
+\# Class weights (if imbalanced dataset detected)
+
+python3 scripts/class\_weights\_calculator.py data/ --output docs/experiments/TSK001\_class\_weights.md
+
+\# Optional: unsupervised clustering (for unlabeled or semi-supervised datasets)
+
+python3 scripts/clustering\_explorer.py data/features.csv --find-k --plot docs/experiments/TSK001\_clusters.png
 
 \`\`\`
 
-Use `assets/template\_lightning\_module.py`, `assets/template\_datamodule.py`, and `assets/quick\_trainer\_setup.py` as starting points for TSK-002 and beyond.
+For TSK-002 and beyond, use assets as starting points:
+
+\- `assets/template\_lightning\_module.py` — LightningModule boilerplate
+
+\- `assets/template\_datamodule.py` — LightningDataModule with train/val/test splits
+
+\- `assets/quick\_trainer\_setup.py` — Standard trainer (single GPU, checkpointing, logging)
+
+\- `assets/advanced\_trainer\_configs.py` — Multi-GPU DDP, FSDP, DeepSpeed, debug, reproducible
+
+\- `assets/template\_gnn\_module.py` — GCN/GAT/GraphSAGE/GIN for graph-structured data
 
 3\. Locate and read `docs/design/03\_Detailed\_Design.md` to understand the task scope and linked requirements.
 

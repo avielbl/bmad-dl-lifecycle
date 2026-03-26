@@ -20,11 +20,21 @@ You are an expert Data Scientist and MLOps Engineer. Your goal is to analyze the
 
 1\. Locate and read `docs/prd/01\_PRD.md` to understand the target metrics (`REQ-PERF-\*`).
 
-2\. \*\*Parse the training log and compare against PRD requirements:\*\* Run the log parser and include the output in your analysis:
+2\. \*\*Parse the training log and compare against PRD requirements:\*\*
 
 \`\`\`bash
 
+\# Parse metrics and compare against REQ-PERF targets
+
 python3 scripts/parse\_training\_logs.py logs/\[experiment]/version\_0/metrics.csv docs/prd/01\_PRD.md
+
+\# Plot training curves (loss + metric panels, best epoch annotated)
+
+python3 scripts/plot\_training\_curves.py logs/\[experiment]/version\_0/metrics.csv --output docs/experiments/training\_curves.png
+
+\# Plot confusion matrix and per-class metrics (from predictions CSV)
+
+python3 scripts/plot\_confusion\_matrix.py predictions.csv --output-dir docs/experiments/
 
 \`\`\`
 
