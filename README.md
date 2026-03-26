@@ -8,54 +8,76 @@ This package provides thirteen structured AI workflow skills covering the full l
 
 ## Getting Started
 
-### 1. Install the package
+### Step 1 — Install the package
 
 ```bash
-# Recommended: git submodule (keeps skills updatable)
+# From your project root — add as a git submodule (keeps skills updatable)
 git submodule add https://github.com/avielbl/bmad-dl-lifecycle _bmad/bmad-dl-lifecycle
 git submodule update --init
 ```
 
-### 2. Scaffold your project (automated)
+### Step 2 — Scaffold (shell command — run once, no AI involved)
+
+Scaffolding always starts with a plain shell command regardless of IDE. It creates all
+folders, writes the IDE config file, and sets up the `uv` project:
 
 ```bash
-# From your workspace root — creates all folders, .clinerules, and pyproject.toml
 python3 _bmad/bmad-dl-lifecycle/bmad-dl-scaffold/scripts/init_project.py \
   --project-name my_project \
   --project-dir . \
-  --ide cline \          # or: claude-code | antigravity | cursor
-  --tracking-tool wandb  # or: mlflow | clearml | undecided
+  --ide cline \           # cline | claude-code | antigravity | cursor
+  --tracking-tool wandb   # wandb | mlflow | clearml | undecided
 ```
 
-Or invoke via the skill: `/bmad-dl-scaffold`
+| `--ide` | Config file written | Skill files copied to |
+|---------|--------------------|-----------------------|
+| `cline` / `cursor` | `.clinerules` | — (referenced by path) |
+| `claude-code` | `.claude/CLAUDE.md` | `.claude/skills/` ← enables slash commands |
+| `antigravity` | `.clinerules` | — (auto-discovered globally) |
 
-This creates the full folder structure, writes `.clinerules` (or `.claude/CLAUDE.md`),
-and initialises a `uv` project with an **empty** `pyproject.toml`.
-**No packages are installed yet.**
+**No packages are installed.** `pyproject.toml` is written with an empty `dependencies = []`.
 
-### 3. Package lifecycle
+### Step 3 — Invoke skills (IDE-specific)
+
+How you trigger each lifecycle stage depends on your IDE:
+
+#### Antigravity
+Skills are auto-discovered globally. Use slash commands directly:
+```
+/bmad-dl-ideation
+/bmad-dl-eda
+...
+```
+
+#### Claude Code
+The scaffold step copies skills into `.claude/skills/`, enabling slash commands:
+```
+/bmad-dl-ideation
+/bmad-dl-eda
+...
+```
+
+#### VSCode + Cline / Cursor
+No slash commands. Tell the AI to follow a skill by referencing its path — either paste
+this into chat or add it to your system prompt:
+
+```
+Follow the workflow in: _bmad/bmad-dl-lifecycle/bmad-dl-ideation/SKILL.md
+```
+
+The `.clinerules` file lists all skill paths for quick copy-paste.
+
+---
+
+### Package lifecycle
 
 | Stage | Action | Who |
 |-------|--------|-----|
-| Stage 1 — `bmad-dl-ideation` | Domain Expert determines required packages and writes them to `pyproject.toml` via `uv add --no-sync` | AI agent |
+| Stage 1 — `bmad-dl-ideation` | Domain Expert determines required packages, writes them via `uv add --no-sync` | AI agent |
 | Stage 5 — `bmad-dl-infra` | **First `uv sync`** — installs everything | AI agent |
-| Any stage | `uv add <pkg>` — adds a new package and updates `pyproject.toml` | AI agent or user |
+| Any stage | `uv add <pkg>` — adds a package and updates `pyproject.toml` | AI agent or user |
 
 > **Never use `pip install`.** All package management goes through `uv`. Never run `uv sync` before Stage 5.
-
-### 4. Run the lifecycle
-
-```
-/bmad-dl-ideation   → frames problem, writes pyproject.toml dependencies
-/bmad-dl-eda          → data exploration, domain interpretation
-/bmad-dl-architecture → model stack, tracking tool selection
-/bmad-dl-detailed-design → INF-* and EXP-* task breakdown
-/bmad-dl-techspec     → pre-experiment contract
-/bmad-dl-infra        → builds infra, runs: uv sync  ← FIRST install
-/bmad-dl-experiment   → executes training runs
-/bmad-dl-analysis     → evaluates vs TECHSPEC tiers
-/bmad-dl-revision     → amends all upstream docs, next hypothesis
-```
 
 ---
 

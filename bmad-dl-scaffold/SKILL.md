@@ -2,7 +2,7 @@
 
 name: bmad-dl-scaffold
 
-description: Scaffolds a new DL project — creates folder structure, .clinerules, and initializes a uv project with a skeleton pyproject.toml. Run once before any other bmad-dl skill. No packages are installed; package selection happens in bmad-dl-ideation (Stage 1) and installation happens in bmad-dl-infra (Stage 5).
+description: Re-scaffolds an existing DL project — adds missing folders, rewrites the IDE config file (.clinerules or .claude/CLAUDE.md), and initializes uv if pyproject.toml is absent. For new projects, run init_project.py directly from the shell instead of invoking this skill.
 
 \---
 
@@ -12,22 +12,46 @@ description: Scaffolds a new DL project — creates folder structure, .clinerule
 
 
 
-\## 1. Operating Instructions
+\## When to use this skill vs the shell command
 
-You are a project scaffolding assistant. Your job is to set up the empty project structure so that every subsequent skill has a consistent, predictable workspace to write into. **No training, no modelling, no package installations happen here.** You are laying the foundation.
+\| Situation \| What to do \|
+\| :--- \| :--- \|
+\| **New project, no folder yet** \| Run `init_project.py` directly from the shell — see README Getting Started \|
+\| **Antigravity** (any situation) \| `/bmad-dl-scaffold` works — Antigravity discovers this skill globally \|
+\| **Existing project, want to add missing folders or rewrite `.clinerules`** \| Invoke this skill — it skips what already exists \|
+
+For Claude Code and Cline on a **brand-new project**, the skill cannot be invoked before the project exists. Run the shell command first, then use slash commands (Claude Code) or reference SKILL.md paths (Cline) for all subsequent stages.
+
+
+
+\## Shell command (primary method for new projects)
+
+\`\`\`bash
+
+python3 _bmad/bmad-dl-lifecycle/bmad-dl-scaffold/scripts/init_project.py \
+  --project-name my_project \
+  --project-dir . \
+  --ide cline \           # cline | claude-code | antigravity | cursor
+  --tracking-tool wandb   # wandb | mlflow | clearml | undecided
+
+\`\`\`
+
+For \`--ide claude-code\`, this also copies all skills into \`.claude/skills/\` so slash commands work immediately.
+
+
+
+\## 1. Operating Instructions (Antigravity / re-scaffold use)
+
+You are a project scaffolding assistant. Your job is to set up or repair the project structure so that every subsequent skill has a consistent, predictable workspace. **No training, no modelling, no package installations happen here.**
 
 
 
 1\. **Ask the user for the following if not already provided:**
 
-   \- `project_name`: Short snake_case name for the project directory (e.g. `pneumonia_classifier`)
-   \- `project_dir`: Absolute path where the project should be created (default: current working directory)
-   \- `ide`: Which IDE will be used? (`claude-code` / `antigravity` / `cline` / `cursor`) — determines which config file to write
-   \- `tracking_tool`: Which experiment tracker? (`wandb` / `mlflow` / `clearml` / `undecided`) — added to `.clinerules` note; can be changed in Architecture stage
-
-
-
-   \- `llm_script_provider`: If utility scripts in this project will call an LLM programmatically (e.g., auto-summarize logs, auto-interpret results), which provider should they use? (`anthropic` / `openai-compatible`) — default: `anthropic`. Note: this is **not** the model running these skill prompts; that is set in your IDE.
+   \- `project_name`: Snake_case name (e.g. `pneumonia_classifier`)
+   \- `project_dir`: Where the project lives (default: current working directory)
+   \- `ide`: `claude-code` / `antigravity` / `cline` / `cursor`
+   \- `tracking_tool`: `wandb` / `mlflow` / `clearml` / `undecided`
 
 
 
@@ -35,7 +59,7 @@ You are a project scaffolding assistant. Your job is to set up the empty project
 
 \`\`\`bash
 
-python3 scripts/init_project.py \
+python3 _bmad/bmad-dl-lifecycle/bmad-dl-scaffold/scripts/init_project.py \
   --project-name "{project_name}" \
   --project-dir "{project_dir}" \
   --ide "{ide}" \
@@ -43,73 +67,48 @@ python3 scripts/init_project.py \
 
 \`\`\`
 
-This script creates all folders, writes `.clinerules` (or `.claude/CLAUDE.md` for Claude Code), and runs `uv init` to create a `pyproject.toml` with no dependencies yet.
+
+
+3\. **Verify output** — confirm with the user that the following are present:
+
+   \- All folders: `docs/`, `data/`, `src/`, `tests/`, `scripts/`, `logs/`, `notebooks/`, `configs/`
+   \- IDE config: `.clinerules` or `.claude/CLAUDE.md`
+   \- For Claude Code: `.claude/skills/bmad-dl-*/` (enables slash commands)
+   \- `pyproject.toml` with empty `dependencies = []`
+   \- `configs/llm_config.yaml`
 
 
 
-3\. **Verify output** — confirm with the user that the following were created:
-
-   \- All folders under `docs/`, `data/`, `src/`, `tests/`, `scripts/`, `logs/`, `notebooks/`
-   \- `.clinerules` (or `.claude/CLAUDE.md`) pointing to all bmad-dl skill files
-   \- `pyproject.toml` with project name and Python version, **no dependencies**
-   \- `.python-version` file pinning Python (default: 3.11)
-   \- `.gitignore` covering common DL artifacts
+4\. **CRITICAL — no package installations yet.** Package requirements are determined in **Stage 1 (bmad-dl-ideation)**. Installations run in **Stage 5 (bmad-dl-infra)** via `uv sync`.
 
 
 
-4\. **CRITICAL — no package installations yet.** The `pyproject.toml` is intentionally empty. Package requirements are determined in **Stage 1 (bmad-dl-ideation)** based on the project's domain and architecture choices. Installations run in **Stage 5 (bmad-dl-infra)** via `uv sync`. Inform the user of this flow.
+5\. **Tell the user how to invoke Stage 1** based on their IDE:
+
+   \- Antigravity / Claude Code: `/bmad-dl-ideation`
+   \- Cline / Cursor: "Tell the AI: follow the workflow in `_bmad/bmad-dl-lifecycle/bmad-dl-ideation/SKILL.md`"
 
 
 
-5\. **Instruct the user on next steps:**
-
-\`\`\`
-
-Project scaffold complete. Next:
-
-  1. /bmad-dl-ideation  ← Domain Expert frames the problem + determines package requirements
-  2. /bmad-dl-eda         ← Data Scientist explores the data
-  3. /bmad-dl-architecture ← AI Architect picks the model stack
-  4. /bmad-dl-detailed-design ← Tech Lead breaks work into INF-* and EXP-* tasks
-  4.5 /bmad-dl-techspec   ← Pre-experiment contract with Domain Expert sign-off
-  5. /bmad-dl-infra       ← Developer builds infra + runs: uv sync
-  ...
-\`\`\`
-
-
-
-\## 2. Expected Output
-
-After running this skill the project root contains:
+\## 2. Expected project structure after scaffolding
 
 \`\`\`
 
 {project_name}/
 ├── pyproject.toml          ← uv project, NO dependencies yet
-├── .python-version         ← e.g. "3.11"
+├── .python-version
 ├── .gitignore
-├── .clinerules             ← (or .claude/CLAUDE.md for Claude Code)
+├── .clinerules             ← or .claude/CLAUDE.md + .claude/skills/ for Claude Code
+├── configs/
+│   └── llm_config.yaml    ← for programmatic LLM calls only
 ├── docs/
-│   ├── prd/
-│   ├── eda/
-│   ├── architecture/
-│   ├── design/
-│   ├── techspecs/
-│   ├── implementation/
-│   ├── experiments/
-│   ├── revisions/
-│   └── knowledge/
+│   ├── prd/ eda/ architecture/ design/ techspecs/
+│   ├── implementation/ experiments/ revisions/ knowledge/
 ├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── splits/
-├── src/
-│   └── {project_name}/
-│       └── __init__.py
-├── tests/
-│   └── __init__.py
-├── scripts/
-│   └── [bmad-dl utility scripts copied here]
+│   ├── raw/ processed/ splits/
+├── src/{project_name}/__init__.py
+├── tests/__init__.py
+├── scripts/               ← bmad-dl utility scripts copied here
 ├── logs/
 ├── notebooks/
 └── configs/
