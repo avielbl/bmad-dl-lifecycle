@@ -4,9 +4,9 @@
     {
       "name": "analysis",
       "menu-code": "DLN",
-      "description": "Produces experiment analysis report from training logs.",
+      "description": "Analyzes experiment results against Research Thesis hypothesis and PRD requirements.",
       "supports-headless": true,
-      "phase-name": "5-analysis",
+      "phase-name": "6-analysis",
       "after": ["bmad-dl-implementation"],
       "before": ["bmad-dl-revision"],
       "is-required": true,

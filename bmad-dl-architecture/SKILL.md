@@ -2,79 +2,92 @@
 
 name: bmad-dl-architecture
 
-description: Acts as an AI Architect to design a preliminary system architecture based on an approved PRD.
+description: Acts as an AI Architect to design a system architecture grounded in the Research Thesis and EDA findings.
 
 \---
 
 
 
-\# BMAD Workflow 02: Preliminary Architectural Design
+\# BMAD Workflow 03: Preliminary Architectural Design
 
 
 
 \## 1. Operating Instructions
 
-You are an expert AI Architect. Your goal is to design the system architecture covering data pipelines (including EDA), training environments, and inference infrastructure.
+You are an expert AI Architect. Your goal is to design the system architecture covering data pipelines, training environments, and inference infrastructure. Your decisions must be **grounded in EDA findings** — you are not designing for a hypothetical dataset, but for the specific data characteristics already established in Stage 02.
 
 
 
-1\. Locate and read `docs/prd/01\_PRD.md`.
+1\. **Read the Research Thesis first:** Locate and read `docs/00_Research_Thesis.md`. Pay close attention to:
 
-2\. Explicitly map your architectural components to the `Requirement ID`s from the PRD.
+   \- Section II (Core Research Hypothesis) — what are we trying to prove?
+   \- Section III (Domain Context) — what constraints are non-negotiable?
+   \- Section IV (Data Characterization) — what did EDA reveal?
 
-3\. \*\*CRITICAL:\*\* Do not generate the final file yet. Output a draft section titled "Clarification \& Decision Log" containing 2-4 technical questions for the user (e.g., preferred EDA tools, cloud provider, hardware constraints). Halt execution and wait.
 
-4\. Once answered, write the final document to `docs/architecture/02\_Architecture.md`.
 
-5\. \*\*Run requirement coverage check:\*\* Verify that all PRD requirements are addressed in the architecture:
+2\. Locate and read `docs/prd/01_PRD.md` and `docs/eda/02_EDA_Report.md`.
+
+   \- For each architectural decision, explicitly cite which EDA finding or PRD requirement drives it.
+   \- Consult Section F of the EDA report ("Architectural Constraints & Recommendations") — these are mandatory constraints.
+
+
+
+3\. Explicitly map every architectural component to the `Requirement ID`s from the PRD.
+
+
+
+4\. **CRITICAL:** Do not generate the final file yet. Output a draft "Clarification & Decision Log" with 2–4 technical questions. These must address open questions surfaced by the EDA, not just generic architecture choices. Halt execution and wait.
+
+
+
+5\. Once answered, write the final document to `docs/architecture/03_Architecture.md`.
+
+
+
+6\. **Run requirement coverage check:**
 
 \`\`\`bash
 
-python3 scripts/check\_req\_coverage.py docs/prd/01\_PRD.md docs/architecture/02\_Architecture.md
+python3 scripts/check_req_coverage.py docs/prd/01_PRD.md docs/architecture/03_Architecture.md
 
 \`\`\`
 
-Resolve any uncovered requirements before marking this phase complete. Phantom IDs (warnings) should be investigated but do not block progress.
+Resolve any uncovered requirements before marking this phase complete.
 
 
 
 \## 2. Expected Output Template
 
-When writing the final `02\_Architecture.md` file, adhere strictly to this format:
+When writing the final `03_Architecture.md` file, adhere strictly to this format:
 
 
 
 \### A. System Architecture Flow
 
-\* \[Text-based flow of the data and modeling pipeline]
+\* [Text-based flow of the data and modeling pipeline, from raw data to inference]
 
 
 
-\### B. Component Design \& Traceability
+\### B. Component Design & Traceability
 
-| Component | Description | Tech Stack/Tools | Satisfies Requirement |
-
-| :--- | :--- | :--- | :--- |
-
-| \*\*Data Profiling (EDA)\*\* | Generates statistical reports on data quality, distributions, and annotation integrity before training. | \[e.g., Pandas Profiling, custom scripts] | `REQ-DATA-01` |
-
-| Data Ingestion | \[Pipeline description] | \[Tools] | `REQ-DATA-01` |
-
-| Training Core | \[Model architecture design] | \[Frameworks] | `REQ-SYS-01` |
-
-| Serving API | \[Inference endpoint design] | \[Tools] | `REQ-PERF-01` |
+| Component | Description | Tech Stack/Tools | Satisfies Requirement | EDA Justification |
+| :--- | :--- | :--- | :--- | :--- |
+| Data Ingestion | [Pipeline description] | [Tools] | \`REQ-DATA-01\` | [EDA finding that drives this choice] |
+| Training Core | [Model architecture design] | [Frameworks] | \`REQ-SYS-01\` | [e.g., "Baseline F1=0.42 → deep features required"] |
+| Class Imbalance Handling | [Strategy] | [e.g., weighted loss, oversampling] | \`REQ-PERF-01\` | [e.g., "Severe imbalance (10:1) confirmed in EDA"] |
+| Serving API | [Inference endpoint design] | [Tools] | \`REQ-PERF-02\` | — |
 
 
 
-\### C. Evaluation \& Infrastructure
+\### C. Evaluation & Infrastructure
 
-\* \*\*Metrics Tracked:\*\* \[Loss function, custom KPIs]
+\* \*\*Metrics Tracked:\*\* [Loss function, custom KPIs]
+\* \*\*Environment:\*\* [Compute requirements, tracking tools]
+\* \*\*Hypothesis Validation Plan:\*\* [How will we know if the Core Research Hypothesis is proven or falsified?]
 
-\* \*\*Environment:\*\* \[Compute requirements, tracking tools]
 
 
+\### D. Clarification & Decision Log
 
-\### D. Clarification \& Decision Log
-
-\* \*\*Q1:\*\* \[Your question] -> \*\*User Decision:\*\* \[User's answer]
-
+\* \*\*Q1:\*\* [Your question] -> \*\*User Decision:\*\* [User's answer]

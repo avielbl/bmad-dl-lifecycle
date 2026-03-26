@@ -4,9 +4,9 @@
     {
       "name": "revision",
       "menu-code": "DLR",
-      "description": "Produces revision plan and updated docs from analysis.",
+      "description": "Updates Research Thesis with new hypothesis and produces revision plan from Domain Expert + Tech Lead.",
       "supports-headless": true,
-      "phase-name": "6-revision",
+      "phase-name": "7-revision",
       "after": ["bmad-dl-analysis"],
       "before": ["bmad-dl-implementation"],
       "output-location": "{output_folder}"

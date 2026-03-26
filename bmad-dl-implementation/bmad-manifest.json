@@ -6,7 +6,7 @@
       "menu-code": "DLM",
       "description": "Executes a task and appends to integration log.",
       "supports-headless": true,
-      "phase-name": "4-implementation",
+      "phase-name": "5-implementation",
       "after": ["bmad-dl-detailed-design"],
       "before": ["bmad-dl-analysis"],
       "is-required": true,

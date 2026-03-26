@@ -4,9 +4,9 @@
     {
       "name": "detailed-design",
       "menu-code": "DLD",
-      "description": "Produces granular task breakdown from architecture.",
+      "description": "Produces granular task breakdown from architecture and EDA constraints.",
       "supports-headless": true,
-      "phase-name": "3-design",
+      "phase-name": "4-design",
       "after": ["bmad-dl-architecture"],
       "before": ["bmad-dl-implementation"],
       "is-required": true,
