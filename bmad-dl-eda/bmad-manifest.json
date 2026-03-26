@@ -7,7 +7,7 @@
       "description": "Performs exploratory data analysis, establishes baselines, and produces an EDA report with domain expert interpretations to constrain architectural decisions.",
       "supports-headless": true,
       "phase-name": "2-eda",
-      "after": ["bmad-dl-initiation"],
+      "after": ["bmad-dl-ideation"],
       "before": ["bmad-dl-architecture"],
       "is-required": true,
       "output-location": "{output_folder}/eda"

@@ -7,7 +7,7 @@
   },
   "skills": [
     {
-      "skill": "bmad-dl-initiation",
+      "skill": "bmad-dl-ideation",
       "name": "initiation",
       "menu-code": "DLI",
       "phase": "1-initiation",
@@ -26,7 +26,7 @@
       "phase": "2-eda",
       "description": "Performs exploratory data analysis, establishes baselines, and produces an EDA report with domain expert interpretations to constrain architectural decisions.",
       "after": [
-        "bmad-dl-initiation"
+        "bmad-dl-ideation"
       ],
       "before": [
         "bmad-dl-architecture"

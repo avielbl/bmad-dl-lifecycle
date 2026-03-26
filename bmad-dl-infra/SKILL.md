@@ -20,11 +20,33 @@ Infrastructure is complete when every component passes a smoke test with dummy d
 
 
 
-1\. **Run the advisor first:** `/bmad-dl-advise` — surface past infrastructure bugs, known compatibility issues, and validated configurations before writing code.
+1\. **Install packages first** — this is the FIRST time `uv sync` runs in the project lifecycle. Packages were written to `pyproject.toml` in Stage 1 (bmad-dl-ideation). Run:
+
+\`\`\`bash
+
+uv sync
+
+\`\`\`
+
+If packages are missing or incorrect, update `pyproject.toml` then re-sync:
+
+\`\`\`bash
+
+uv add <package>          # adds + records in pyproject.toml
+uv remove <package>       # removes + records in pyproject.toml
+uv sync                   # install/update all
+
+\`\`\`
+
+Never use `pip install`. All package management goes through `uv`.
 
 
 
-2\. **Resolve the next INF task:**
+2\. **Run the advisor:** `/bmad-dl-advise` — surface past infrastructure bugs, known compatibility issues, and validated configurations before writing code.
+
+
+
+3\. **Resolve the next INF task:**
 
 \`\`\`bash
 
@@ -34,7 +56,7 @@ python3 scripts/get_next_task.py docs/design/04_Detailed_Design.md docs/implemen
 
 
 
-3\. **Read context documents:**
+4\. **Read context documents:**
 
    \- `docs/00_Research_Thesis.md` — understand the research goal and constraints
    \- `docs/eda/02_EDA_Report.md` — apply EDA findings (class weights, augmentation strategy, data format)
@@ -42,7 +64,7 @@ python3 scripts/get_next_task.py docs/design/04_Detailed_Design.md docs/implemen
 
 
 
-4\. **Build components** in this recommended order (each should be independently smoke-testable):
+5\. **Build components** in this recommended order (each should be independently smoke-testable):
 
    **a. Data Pipeline** — Dataset class, DataLoader, augmentation transforms, data validation
 
@@ -135,32 +157,32 @@ def health():
 
 
 
-5\. **Smoke test** each component before marking complete:
+6\. **Smoke test** each component before marking complete:
 
 \`\`\`bash
 
-\# Run infrastructure smoke test with dummy data
-python3 -m pytest tests/test_infra_smoke.py -v
+\# Run infrastructure smoke test with dummy data (use uv run, not python3 directly)
+uv run pytest tests/test_infra_smoke.py -v
 
 \# Verify experiment tracking connection
-python3 -c "from src.tracking import make_[wandb|mlflow|clearml]_logger; print('tracking OK')"
+uv run python -c "from src.tracking import make_[wandb|mlflow|clearml]_logger; print('tracking OK')"
 
 \# Verify ONNX export (if applicable)
-python3 scripts/export_onnx.py --checkpoint path/to/dummy.ckpt --output /tmp/smoke_test.onnx
+uv run python scripts/export_onnx.py --checkpoint path/to/dummy.ckpt --output /tmp/smoke_test.onnx
 
 \`\`\`
 
 
 
-6\. **CRITICAL:** Do not merge or finalize yet. Present the proposed code and smoke test results. Ask clarification questions about edge cases. Halt and wait.
+7\. **CRITICAL:** Do not merge or finalize yet. Present the proposed code and smoke test results. Ask clarification questions about edge cases. Halt and wait.
 
 
 
-7\. Upon user approval, save files and append an entry to `docs/implementation/05_Infra_Log.md`.
+8\. Upon user approval, save files and append an entry to `docs/implementation/05_Infra_Log.md`.
 
 
 
-8\. **Run `/bmad-dl-retrospective`** at the end of the session.
+9\. **Run `/bmad-dl-retrospective`** at the end of the session.
 
 
 

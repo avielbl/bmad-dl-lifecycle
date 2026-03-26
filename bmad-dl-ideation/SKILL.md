@@ -1,6 +1,6 @@
 \---
 
-name: bmad-dl-initiation
+name: bmad-dl-ideation
 
 description: Acts as a Domain Expert to frame a ML/DL research problem, define requirements, and produce the Research Thesis and PRD. Use this when starting a new AI model project.
 
@@ -53,7 +53,37 @@ You are an expert Domain Expert for this ML/DL project. Your unique value is **d
 
 
 
-5\. **Run validation script:** After writing the PRD, validate it:
+5\. **Determine package requirements** based on the project type and record them in `pyproject.toml`. This is the ONLY time packages are added to `pyproject.toml` in Stage 1. They will be installed by `uv sync` in Stage 5 (bmad-dl-infra).
+
+   Derive requirements from the user's answers:
+   \- Deep learning framework: `torch` + `torchvision` / `tensorflow` / `jax`
+   \- Training framework: `lightning` (recommended for PyTorch projects)
+   \- Data: `numpy`, `pandas`, `pillow`, `opencv-python`, etc.
+   \- Experiment tracking: `wandb` / `mlflow` / `clearml` (whichever was chosen)
+   \- Evaluation: `scikit-learn`, `torchmetrics`
+   \- Inference: `onnx`, `onnxruntime` (if export required by constraints)
+
+   Write the chosen packages into `[project.dependencies]` in `pyproject.toml`:
+
+\`\`\`bash
+
+# DO NOT run uv sync yet — packages are installed in Stage 5 (bmad-dl-infra)
+# Just update the file:
+uv add --no-sync torch torchvision lightning wandb scikit-learn torchmetrics numpy pillow
+
+\`\`\`
+
+   If `pyproject.toml` does not exist (project was not scaffolded with `bmad-dl-scaffold`), create it manually or run:
+
+\`\`\`bash
+
+uv init --name {project_name} --no-readme
+
+\`\`\`
+
+
+
+6\. **Run validation script:** After writing the PRD, validate it:
 
 \`\`\`bash
 

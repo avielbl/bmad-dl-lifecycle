@@ -6,13 +6,67 @@ This package provides thirteen structured AI workflow skills covering the full l
 
 ---
 
+## Getting Started
+
+### 1. Install the package
+
+```bash
+# Recommended: git submodule (keeps skills updatable)
+git submodule add https://github.com/avielbl/bmad-dl-lifecycle _bmad/bmad-dl-lifecycle
+git submodule update --init
+```
+
+### 2. Scaffold your project (automated)
+
+```bash
+# From your workspace root — creates all folders, .clinerules, and pyproject.toml
+python3 _bmad/bmad-dl-lifecycle/bmad-dl-scaffold/scripts/init_project.py \
+  --project-name my_project \
+  --project-dir . \
+  --ide cline \          # or: claude-code | antigravity | cursor
+  --tracking-tool wandb  # or: mlflow | clearml | undecided
+```
+
+Or invoke via the skill: `/bmad-dl-scaffold`
+
+This creates the full folder structure, writes `.clinerules` (or `.claude/CLAUDE.md`),
+and initialises a `uv` project with an **empty** `pyproject.toml`.
+**No packages are installed yet.**
+
+### 3. Package lifecycle
+
+| Stage | Action | Who |
+|-------|--------|-----|
+| Stage 1 — `bmad-dl-ideation` | Domain Expert determines required packages and writes them to `pyproject.toml` via `uv add --no-sync` | AI agent |
+| Stage 5 — `bmad-dl-infra` | **First `uv sync`** — installs everything | AI agent |
+| Any stage | `uv add <pkg>` — adds a new package and updates `pyproject.toml` | AI agent or user |
+
+> **Never use `pip install`.** All package management goes through `uv`. Never run `uv sync` before Stage 5.
+
+### 4. Run the lifecycle
+
+```
+/bmad-dl-ideation   → frames problem, writes pyproject.toml dependencies
+/bmad-dl-eda          → data exploration, domain interpretation
+/bmad-dl-architecture → model stack, tracking tool selection
+/bmad-dl-detailed-design → INF-* and EXP-* task breakdown
+/bmad-dl-techspec     → pre-experiment contract
+/bmad-dl-infra        → builds infra, runs: uv sync  ← FIRST install
+/bmad-dl-experiment   → executes training runs
+/bmad-dl-analysis     → evaluates vs TECHSPEC tiers
+/bmad-dl-revision     → amends all upstream docs, next hypothesis
+```
+
+---
+
 ## Skills Overview
 
 ### Sequential Lifecycle Skills
 
 | # | Skill | Role | Output |
 |---|-------|------|--------|
-| 1 | `bmad-dl-initiation` | Domain Expert | `docs/00_Research_Thesis.md` + `docs/prd/01_PRD.md` |
+| 0 | `bmad-dl-scaffold` | Scaffolding | Folder structure, `.clinerules`, `pyproject.toml` (no deps) |
+| 1 | `bmad-dl-ideation` | Domain Expert | `docs/00_Research_Thesis.md` + `docs/prd/01_PRD.md` + `pyproject.toml` deps |
 | 2 | `bmad-dl-eda` | Data Scientist | `docs/eda/02_EDA_Report.md` |
 | 3 | `bmad-dl-architecture` | AI Architect | `docs/architecture/03_Architecture.md` |
 | 4 | `bmad-dl-detailed-design` | AI Tech Lead | `docs/design/04_Detailed_Design.md` (INF-* + EXP-* tasks) |
@@ -95,8 +149,10 @@ Team knowledge base — accumulated via `/bmad-dl-retrospective`. Each entry con
 ## Lifecycle Flow
 
 ```
-[1] Initiation (Domain Expert)
-    ↓  docs/00_Research_Thesis.md  +  docs/prd/01_PRD.md
+[0] Init (once — automated scaffolding)
+    ↓  folder structure  +  .clinerules  +  pyproject.toml (no deps)
+[1] Ideation (Domain Expert)
+    ↓  docs/00_Research_Thesis.md  +  docs/prd/01_PRD.md  +  pyproject.toml deps
 [2] EDA (Data Scientist + Domain Expert interpretation)
     ↓  docs/eda/02_EDA_Report.md  +  Thesis §IV updated
 [3] Architecture (reads Thesis + EDA)
@@ -106,6 +162,7 @@ Team knowledge base — accumulated via `/bmad-dl-retrospective`. Each entry con
 [4.5] TECHSPEC (pre-experiment contract, Domain Expert sign-off)
     ↓  docs/techspecs/TECHSPEC_EXP_[ID].md
 [5] Infra Build (INF-* tasks, smoke-test gate)
+    ↓  uv sync  ← FIRST package installation in the project
     ↓  docs/implementation/05_Infra_Log.md
     ↓  data pipeline · training loop · W&B/MLflow/ClearML · eval harness · inference API
 [6] Experiment (EXP-* tasks, tracking-tool logged)   ← /advise before, /retro after
@@ -130,6 +187,7 @@ Team knowledge base — accumulated via `/bmad-dl-retrospective`. Each entry con
 - [BMAD Method](https://github.com/bmad-code-org/bmad-method) installed (`_bmad/` folder present)
 - An AI IDE: Claude Code, Antigravity, or VSCode + Cline
 - Recommended model: Claude Sonnet 4.5+ or equivalent
+- [uv](https://docs.astral.sh/uv/) installed (`pip install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`)
 
 ---
 
@@ -189,7 +247,7 @@ Auto-discovered from `_bmad/` — no setup needed.
 ```markdown
 # BMAD DL Lifecycle Skills
 
-- Frame research question / PRD: `_bmad/bmad-dl-lifecycle/bmad-dl-initiation/SKILL.md`
+- Frame research question / PRD: `_bmad/bmad-dl-lifecycle/bmad-dl-ideation/SKILL.md`
 - Exploratory data analysis: `_bmad/bmad-dl-lifecycle/bmad-dl-eda/SKILL.md`
 - Architecture design: `_bmad/bmad-dl-lifecycle/bmad-dl-architecture/SKILL.md`
 - Task breakdown (INF-* + EXP-*): `_bmad/bmad-dl-lifecycle/bmad-dl-detailed-design/SKILL.md`
@@ -207,6 +265,9 @@ Auto-discovered from `_bmad/` — no setup needed.
 
 ## Key Principles
 
+- **Scaffold first, install last.** `bmad-dl-scaffold` creates the folder structure without installing packages. The first `uv sync` runs in `bmad-dl-infra` (Stage 5). Never `pip install` or `uv sync` before that.
+- **Package decisions in Ideation.** The Domain Expert (Stage 1) determines the framework stack and writes packages to `pyproject.toml` via `uv add --no-sync`. Architecture or domain constraints drive these choices.
+- **Use `uv` everywhere.** No `pip install`, no `python -m venv`. Commands: `uv add <pkg>`, `uv sync`, `uv run pytest`.
 - **Infra before experiments.** `bmad-dl-infra` builds the runway; `bmad-dl-experiment` flies the plane. Never mix them.
 - **HPO only after baseline confirmation.** HPO on a broken architecture wastes compute. Wait for Analysis to clear the minimum viable tier.
 - **Run `/bmad-dl-advise` before every experiment.** Skip the days of rediscovery.
@@ -251,6 +312,54 @@ docs/
 
 ---
 
+## LLM Engine Configuration
+
+### Agent model (IDE-level)
+
+The model that **executes the SKILL.md prompts** is set inside your IDE — not here:
+
+| IDE | Where to configure |
+|-----|--------------------|
+| **Cline** | VS Code settings → Cline → Model |
+| **Antigravity** | Antigravity settings → Model selector |
+| **Claude Code** | `/model` command or `--model` flag |
+| **Cursor** | Cursor settings → Model |
+
+Any OpenAI-compatible endpoint supported by your IDE works. Switch models between stages freely — the skills are model-agnostic.
+
+### Programmatic LLM calls (script-level)
+
+Some utility scripts call an LLM directly (e.g., auto-summarization, log interpretation). These use `scripts/llm_client.py`, configured via `configs/llm_config.yaml`.
+
+`bmad-dl-scaffold` copies both files into your project. Edit `configs/llm_config.yaml` to point at the right provider:
+
+```yaml
+# Anthropic / Claude (default)
+provider: anthropic
+model: claude-sonnet-4-6
+base_url: ~
+api_key_env: ANTHROPIC_API_KEY
+
+# OpenAI-compatible (any endpoint)
+# provider: openai-compatible
+# model: gpt-4o                       # or: llama3.1:70b, mistral-large-latest, etc.
+# base_url: http://localhost:11434/v1  # Ollama, vLLM, Together, Groq, Mistral, Azure…
+# api_key_env: OPENAI_API_KEY
+```
+
+Usage in a script:
+
+```python
+from scripts.llm_client import LLMClient
+
+client = LLMClient()  # reads configs/llm_config.yaml
+summary = client.chat("Summarise these training logs: ...", system="You are a data scientist.")
+```
+
+The API key is **never stored in the config file** — it lives in the env var named by `api_key_env`.
+
+---
+
 ## CI/CD
 
 Two GitHub Actions workflows are included:
@@ -269,6 +378,7 @@ Two GitHub Actions workflows are included:
 | Breaking output format change | Major |
 
 **Changelog:**
+- `v2.1.0` — Added `bmad-dl-scaffold` (Stage 0): automated project scaffolding with `uv`. Creates folder structure, `.clinerules`/`CLAUDE.md`, and an empty `pyproject.toml`. Package requirements are now determined in Stage 1 (`bmad-dl-ideation`) and the first `uv sync` runs in Stage 5 (`bmad-dl-infra`). All skills updated to use `uv run` instead of `python3` directly. README includes full Getting Started guide.
 - `v2.0.0` — Split `bmad-dl-implementation` into `bmad-dl-infra` (INF-* tasks, infrastructure + tracking setup) and `bmad-dl-experiment` (EXP-* tasks, training runs). Added `bmad-dl-hparam` (conditional HPO with Optuna/W&B Sweeps/Ray Tune/ClearML HPO). Native W&B, MLflow, and ClearML integration in infra/experiment/analysis skills. Revised task namespace (INF-*/EXP-*/REV-*). `bmad-dl-revision` now explicitly audits and amends all upstream documents. `bmad-dl-analysis` queries tracking tools directly. Stage numbers updated.
 - `v1.2.0` — Knowledge flywheel: `bmad-dl-advise`, `bmad-dl-retrospective`, `bmad-dl-techspec`. Mandatory Failed Attempts sections. GitHub Actions CI.
 - `v1.1.0` — Dedicated EDA stage. Domain Expert role. Research Thesis document.
