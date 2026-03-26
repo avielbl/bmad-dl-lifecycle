@@ -91,7 +91,26 @@ python3 _bmad/bmad-dl-lifecycle/bmad-dl-ideation/scripts/validate_prd.py docs/pr
 
 \`\`\`
 
-Fix any reported errors before marking this phase complete.
+Fix any reported errors before proceeding.
+
+
+
+7. **CRITICAL — Halt and request review:** Present both output documents to the user for review:
+
+   > "Both documents have been written and validation passed. Please review:
+   > - `docs/00_Research_Thesis.md` — research framing, hypothesis, domain context
+   > - `docs/prd/01_PRD.md` — traceable requirements, data strategy, constraints
+   >
+   > Provide any corrections or additions. When you are satisfied, I will mark the `[ ] Approved for EDA (Stage 02)` checkbox and this phase will be complete."
+
+   Do NOT mark the approval checkbox yet. Halt execution and wait for the user to confirm or request changes.
+
+
+
+8. Upon user approval, update `docs/prd/01_PRD.md` Section E:
+
+   - Change `[ ] Approved for EDA (Stage 02)` to `[x] Approved for EDA (Stage 02)`
+   - The next stage is `/bmad-dl-eda`.
 
 
 
