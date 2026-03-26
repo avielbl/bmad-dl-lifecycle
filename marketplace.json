@@ -2,7 +2,7 @@
   "module": {
     "code": "bmad-dl-lifecycle",
     "name": "bmad-dl-lifecycle",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "description": "Agentic workflows for the Deep Learning development lifecycle."
   },
   "skills": [
@@ -54,7 +54,7 @@
       "name": "detailed-design",
       "menu-code": "DLD",
       "phase": "4-design",
-      "description": "Produces granular task breakdown from architecture and EDA constraints.",
+      "description": "Produces INF-* infrastructure tasks and EXP-* experiment tasks from architecture and EDA constraints.",
       "after": [
         "bmad-dl-architecture"
       ],
@@ -80,13 +80,28 @@
       "is-required": true
     },
     {
-      "skill": "bmad-dl-implementation",
-      "name": "implementation",
-      "menu-code": "DLM",
-      "phase": "5-implementation",
-      "description": "Executes a task and appends to integration log with mandatory failure documentation.",
+      "skill": "bmad-dl-infra",
+      "name": "infra",
+      "menu-code": "DLI2",
+      "phase": "5-infra",
+      "description": "Builds all project infrastructure (data pipeline, training loop, experiment tracking, evaluation harness, inference API) before experiments begin. Handles INF-* tasks. Infrastructure is done when smoke test passes with dummy data.",
       "after": [
         "bmad-dl-techspec"
+      ],
+      "before": [
+        "bmad-dl-experiment"
+      ],
+      "supports-headless": true,
+      "is-required": true
+    },
+    {
+      "skill": "bmad-dl-experiment",
+      "name": "experiment",
+      "menu-code": "DLE2",
+      "phase": "6-experiment",
+      "description": "Executes training runs against a locked TECHSPEC, logs all metrics and artifacts to the experiment tracker (W&B/MLflow/ClearML), and produces the Experiment Log. Handles EXP-* tasks. Requires bmad-dl-infra to be complete first.",
+      "after": [
+        "bmad-dl-infra"
       ],
       "before": [
         "bmad-dl-analysis"
@@ -98,30 +113,57 @@
       "skill": "bmad-dl-analysis",
       "name": "analysis",
       "menu-code": "DLN",
-      "phase": "6-analysis",
-      "description": "Analyzes experiment results against Research Thesis hypothesis and PRD requirements.",
+      "phase": "7-analysis",
+      "description": "Analyzes experiment results from tracking tool (W&B/MLflow/ClearML), evaluates against TECHSPEC tiers, verifies hypothesis verdict with Domain Expert.",
       "after": [
-        "bmad-dl-implementation"
+        "bmad-dl-experiment"
       ],
       "before": [
+        "bmad-dl-hparam",
         "bmad-dl-revision"
       ],
       "supports-headless": true,
       "is-required": true
     },
     {
-      "skill": "bmad-dl-revision",
-      "name": "revision",
-      "menu-code": "DLR",
-      "phase": "7-revision",
-      "description": "Updates Research Thesis with new hypothesis and produces revision plan from Domain Expert + Tech Lead.",
+      "skill": "bmad-dl-hparam",
+      "name": "hparam",
+      "menu-code": "DLH",
+      "phase": "7.5-hparam",
+      "description": "Runs structured hyperparameter optimization (Optuna, W&B Sweeps, Ray Tune, ClearML HPO) after a baseline architecture is confirmed. Conditional stage \u2014 run only after Analysis confirms the baseline meets the TECHSPEC minimum viable tier.",
       "after": [
         "bmad-dl-analysis"
       ],
       "before": [
-        "bmad-dl-implementation"
+        "bmad-dl-experiment"
       ],
       "supports-headless": true,
+      "is-required": false
+    },
+    {
+      "skill": "bmad-dl-revision",
+      "name": "revision",
+      "menu-code": "DLR",
+      "phase": "8-revision",
+      "description": "Conducts document audit across Thesis, PRD, Architecture and Detailed Design; formulates next hypothesis with Domain Expert; generates new INF-* and EXP-* tasks for next cycle.",
+      "after": [
+        "bmad-dl-analysis"
+      ],
+      "before": [
+        "bmad-dl-techspec"
+      ],
+      "supports-headless": true,
+      "is-required": false
+    },
+    {
+      "skill": "bmad-dl-implementation",
+      "name": "implementation",
+      "menu-code": "DLM",
+      "phase": "deprecated",
+      "description": "DEPRECATED in v2.0.0. Use bmad-dl-infra for INF-* tasks and bmad-dl-experiment for EXP-* tasks.",
+      "after": [],
+      "before": [],
+      "supports-headless": false,
       "is-required": false
     },
     {
